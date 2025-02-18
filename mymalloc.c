@@ -1,3 +1,5 @@
+//This should have no main{} function, it should just be our "library" of functions, malloc and free.
+// -- as well as any helper objects (or functions).
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
