@@ -3,7 +3,7 @@ Dennis Karpenko (dk1111), Suk Jin Hong (sh1949)
 
 
 
-Test Plan: // This a plan of our "plan" to test our malloc and free to make sure they work. Proffesor said it has to be "rigorous", 
+Test Plan: // This a plan of our "plan" to test our malloc and free to make sure they work. Professor said it has to be "rigorous", 
 //shouldn't be too crazy, but it shouldn't too simple 
 
 Program Descriptions: //what our functions input and output
