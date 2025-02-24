@@ -16,6 +16,8 @@ int main(){
         free(ptr);
     }
 
+    printf("yippee");
+    
     char* arr[120];
     for(int i = 0; i < 120; i++){
         arr[i] = malloc(1);
@@ -23,7 +25,6 @@ int main(){
     for(int i = 0; i < 120; i++){
         free(arr[i]);
     }
-
     for(int i = 0; i < 120; i++){
         int whatDo = rand();
         int arrIndex = 0;
