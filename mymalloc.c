@@ -12,10 +12,29 @@ static union {  // heap 변수 다른 파일에서 직접 접근 불가능, unio
     double align;
 } heap;
 
+void leak_detector(){
+    //int num_bytes = 0;
+    int num_objects = 0;
+    int location = 0;
+    while(location <= 4096){
+        if(*(int *)(heap.bytes + location + 4) == 1){
+            //num_bytes += *(int *)(heap.bytes + location);
+            num_objects++;
+            location += *(int *)(heap.bytes + location);
+        }
+    }
+    if(num_objects > 0){
+        //printf("mymalloc: %d bytes leaked in %d objects", num_bytes, num_objects);
+        printf("mymalloc: %d objects leaked", num_objects);
+    }
+}
+
 void init_heap() {
         *(int *)(heap.bytes) = 4088;
         *(int *)(heap.bytes + 4) = 0;
         isIni = 1;
+
+        atexit(leak_detector);
 }
 
 void *mymalloc(size_t size, char *file, int line) {
@@ -49,33 +68,6 @@ void *mymalloc(size_t size, char *file, int line) {
         return NULL;
 }
 
-void badPointer(void *ptr, char *file, int line) {
-    int diff = (char *)heap.bytes - (char *)ptr;
-        if (diff < 0 || diff >= MEMLENGTH) {    // condition 1
-            fprintf("free: Inappropriate pointer (%s.c%d)", file, line);
-            exit(2);
-        } 
-        int location = 0;
-        while (location < MEMLENGTH) {  // condition 2
-            if ((int *)(heap.bytes + location + 8) <= ptr) {
-                if ((int *)(heap.bytes + location + 8) == ptr) {
-                    *(int *)(heap.bytes + location - 4) = 0;
-                    coalesce();
-                } else {
-                    location += *(int *)(heap.bytes + location + 4);  
-                }
-            } else {
-                fprintf("free: Inappropriate pointer (%s.c%d)", file, line);
-                exit(2);
-            }
-        }
-        if (*(int *)(ptr - 4) == 0) { // condition 3
-            fprintf("free: Inappropriate pointer (%s.c%d)", file, line);
-            exit(2);
-            // similiar with condition 2
-        }
-}
-
 void coalesce(){
     int location = 0;
     while(location < 4096){
@@ -94,20 +86,31 @@ void coalesce(){
     }
 }
 
-void leak_detector(){
-    int num_bytes = 0;
-    int num_objects = 0;
-    int location = 0;
-    while(location <= 4096){
-        if(*(int *)(heap.bytes + location + 4) == 1){
-            num_bytes += *(int *)(heap.bytes + location);
-            num_objects++;
-            location += *(int *)(heap.bytes + location);
+void badPointer(void *ptr, char *file, int line) {
+    int diff = (char *)heap.bytes - (char *)ptr;
+        if (diff < 0 || diff >= MEMLENGTH) {    // condition 1
+            printf("free: Inappropriate pointer (%s.c%d)", file, line);
+            exit(2);
+        } 
+        int location = 0;
+        while (location < MEMLENGTH) {  // condition 2
+            if ((int *)(heap.bytes + location + 8) <= (int *)ptr) {
+                if ((int *)(heap.bytes + location + 8) == ptr) {
+                    *(int *)(heap.bytes + location - 4) = 0;
+                    coalesce();
+                } else {
+                    location += *(int *)(heap.bytes + location + 4);  
+                }
+            } else {
+                printf("free: Inappropriate pointer (%s.c%d)", file, line);
+                exit(2);
+            }
         }
-    }
-    if(num_objects > 0){
-        fprintf("mymalloc: %d bytes leaked in %d objects", num_bytes, num_objects);
-    }
+        if (*(int *)(ptr - 4) == 0) { // condition 3
+            printf("free: Inappropriate pointer (%s.c%d)", file, line);
+            exit(2);
+            // similiar with condition 2
+        }
 }
 
 void myfree(void *ptr, char *file, int line) {
