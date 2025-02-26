@@ -16,12 +16,12 @@ void leak_detector(){
     //int num_bytes = 0;
     int num_objects = 0;
     int location = 0;
-    while(location <= 4096){
+    while(location < MEMLENGTH - 8){
         if(*(int *)(heap.bytes + location + 4) == 1){
-            //num_bytes += *(int *)(heap.bytes + location);
             num_objects++;
-            location += *(int *)(heap.bytes + location);
+            printf("")
         }
+            location += *(int *)(heap.bytes + location) + 8;
     }
     if(num_objects > 0){
         //printf("mymalloc: %d bytes leaked in %d objects", num_bytes, num_objects);
@@ -47,17 +47,16 @@ void *mymalloc(size_t size, char *file, int line) {
 
     while(location <= MEMLENGTH - 8) {
         int chunkSize = *(int *)(heap.bytes + location);
-        int temp = chunkSize;
         int chunkAllocation = *(int *)(heap.bytes + location + 4);
         if (chunkSize >= size && chunkAllocation == 0) {
             if (chunkSize == size) {
                 *(int *)(heap.bytes + location + 4) = 1;
                 return (void *)(heap.bytes + location + 8);
             } else {
-                *(int *)(heap.bytes + location) = size;
+                *(int *)(heap.bytes + location) = size; // = x * 8
                 chunkAllocation = *(int *)(heap.bytes + location + 4) = 1;
 
-                *(int *)(heap.bytes + location + size + 8) = temp - size;
+                *(int *)(heap.bytes + location + size + 8) = chunkSize - size;
                 *(int *)(heap.bytes + location + size + 12) = 0;
                 return (void *)(heap.bytes + location + 8);
             }

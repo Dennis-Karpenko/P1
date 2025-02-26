@@ -3,9 +3,28 @@ Dennis Karpenko (dk1111), Suk Jin Hong (sh1949)
 
 
 
-Test Plan: // This a plan of our "plan" to test our malloc and free to make sure they work. Professor said it has to be "rigorous", 
-//shouldn't be too crazy, but it shouldn't too simple 
+Test Plan: 
+
+Test 1-3 are as written in (4.0) of the project writeup.
+We have test 3 iterate through the array in both cases (even though Professor M. said we could maybe do it using random selection, within the array -- shouldn't be too hard to change).
+
+Test
 
 Program Descriptions: //what our functions input and output
 
-Design Notes: //why we made certain design choices
+Leak Detector: Manually goes through the linked list, updates counter if node is allocated. Pretty simple, nothing much here.
+
+init_heap: Allocates the entire heap as one free chunk, updates (is_Init global variable/boolean), runs leak_detector at exit. Also pretty simple
+
+mymalloc: We initialize the heap (if it hasn't been initialized yet), round the desired malloc(size) to a multiple of 8, using the (size + 7) & ~ 7 
+bitshift (?), as shown in class. One of the design choices we made, was checking to see if the found free chunk is the same size as the desired malloc(size), so that we don't run into issues where we potentially have bit overwrites. Otherwise, it's pretty simple, we just create two chunks (splitting the free one we found), one is allocated, the remaining bits are free. If we can't find a free chunk after iterating through the heap, we output an error.
+
+The most important thing for this function was being intentional with the heap iteration, making sure to (+8 or +4) bits to make so that we're not undercounting headers when iterating (otherwise we have problems with solutions that are hard to find).
+
+myfree: This consists of two functions badPointer, and coalesce. badPointer is just the three error cases described in (2.1) of the write up. Conveniently (thank you professor), these are sequentially the exact (logical) checks you need to make to make sure your pointer is ok (checkin if it's in bounds, if we're not freeing a header/payload start, freeing a free block) --- doing them in any other order would lead to errors most likely. As for coalesce, it as it states in the name, is our function to coalesce blocks. All it does is iterate through the linked list (again, not forgetting to +8 and +4 to account for headers when needed), and if it finds two sequential free chunks, it increases the first one, and I think leaves the second as garbage data --- (it's not like you can delete it per say), and the client will overwrite it any way.
+
+
+
+
+Design Notes: 
+

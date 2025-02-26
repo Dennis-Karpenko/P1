@@ -18,19 +18,23 @@ int main(){
 
     printf("yippee");
     
-    char* arr[120];
+    void* arr[120];
     for(int i = 0; i < 120; i++){
         arr[i] = malloc(1);
     }
     for(int i = 0; i < 120; i++){
         free(arr[i]);
     }
+
+
+
+
+
     for(int i = 0; i < 120; i++){
-        int whatDo = rand();
         int arrIndex = 0;
-        if(whatDo >= RAND_MAX / 2){
+        if(rand() % 2 == 0){
             while(arrIndex < 120){
-                if(arr[arrIndex] == NULL){
+                if(arr[arrIndex] == NULL){ //might be wrong
                     arr[arrIndex] = malloc(1);
                     arrIndex = 0;
                     break;
@@ -39,9 +43,8 @@ int main(){
             }
         }
         else{
-           
             while(arrIndex < 120){
-                if(arr[arrIndex] != NULL){
+                if(arr[arrIndex] != NULL && *(int *)(arr[arrIndex] - 4) == 1){
                     free(arr[arrIndex]);
                     arrIndex = 0;
                     break;
@@ -50,5 +53,10 @@ int main(){
             }
         }
     }
-
+    for(int i = 0; i < 120; i++){
+        if(arr[i] != NULL){
+            free(arr[i]);
+        }
+    }
+    return EXIT_SUCCESS;
 }
