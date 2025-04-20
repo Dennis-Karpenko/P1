@@ -1,0 +1,69 @@
+at byte 1000 we have a header and a chunk of size 250; (int = size, boolean is it activated). 
+
+We go to the location in memory *(int *)(byte 1000) = 256;
+we go to *(int *)(bytes[4]) = 0;
+
+
+If we want the next chunk we just do *(int *)(byte 1000 + 256 + 8) <-- new header
+
+
+[(size, active?)header|       chunk     |     header |        chunk     | header|         chunk]
+
+malloc(500)
+
+header((4 bytes) size of chunk, (4 bytes) is it active)   <- not an actual struct
+
+in malloc(size){
+    int location = 0;
+    int adjusted size   //(size+7) & ~7;
+
+
+    while(4096 - location >= size){
+        chunkSize = *(int *)(heap.bytes + location);
+        int temp = chunkSize;
+        chunkAllocation = *(int *)(heap.bytes + location + 4);
+        if(chunkSize >= adjustedsize && chunkAllocation == 0){
+            if(chunksize = adjustedSize){
+                *(int *)(heap.bytes + location + 4) = 1;
+                return;
+            }
+            else{
+                *(int *)(heap.bytes + location) = adjustedSize;
+                chunkAllocation = *(int *)(heap.bytes + location + 4) = 1;
+
+                *(int *)(heap.bytes + location + adjustedSize) = temp - adjustedSize;
+                *(int *)(heap.bytes + location + adjustedSize + 4) = 0;
+                return;
+            }
+        }
+        else{
+            location += chunkSize + 8;
+        }
+    }
+        printf(error statement)
+        
+    }
+
+
+
+
+
+
+
+
+myfree(X, file. line) 
+
+int difference = (char *)(heap.bytes) - (char *)(X);
+    if(difference < 0 || difference >= MEMSIZE)
+
+
+
+    source.c -> %s.c ; source is the filename
+
+    location += *(int *)(heap.bytes + location + 4)
+
+
+
+    if(*(int *)(ptr - 4) == 0){
+        error message // we're freeing a free pointer
+    }
